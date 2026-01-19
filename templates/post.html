@@ -91,7 +91,7 @@
 
     /* ===== MOCK FETCH COMMENTS ===== */
     async function fetchComments() {
-        const res = await fetch(`http://127.0.0.1:8000/api/posts/${postId}/comments`);
+        const res = await fetch(`https://duyendauvn-blog.hf.space/api/posts/${postId}/comments`);
         const data = await res.json();
         renderComments(data.comments);
     }
@@ -126,7 +126,7 @@
         formData.append("name", name);
         formData.append("content", content);
 
-        const res = await fetch(`http://127.0.0.1:8000/api/posts/${postId}/comments`, {
+        const res = await fetch(`https://duyendauvn-blog.hf.space/api/posts/${postId}/comments`, {
             method: "POST",
             body: formData
         });
