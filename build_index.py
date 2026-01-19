@@ -2,7 +2,7 @@ import argparse, json, os
 from jinja2 import Environment, FileSystemLoader
 
 env = Environment(loader=FileSystemLoader("templates"))
-DIST = "/"
+DIST = "."
 
 def build_site(template_name: str, slug: str, context: dict):
     html = env.get_template(template_name).render(context)
