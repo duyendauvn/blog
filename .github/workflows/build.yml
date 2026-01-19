@@ -5,6 +5,7 @@ on:
     types:
       - build_post
       - build_index
+      - build_all_posts
 
 permissions:
   contents: write
@@ -68,6 +69,26 @@ jobs:
           echo "Posts count: $(echo '${{ toJson(github.event.client_payload.posts) }}' | jq length)"
           echo "Year: ${{ github.event.client_payload.now.year }}"
 
+          python build_index.py \
+            --posts '${{ toJson(github.event.client_payload.posts) }}' \
+            --site '${{ toJson(github.event.client_payload.site) }}' \
+            --year "${{ github.event.client_payload.now.year }}"
+
+      - name: Build all posts
+        if: github.event.action == 'build_all_posts'
+        run: |
+          echo "Building ALL posts..."
+          echo "Posts count: $(echo '${{ toJson(github.event.client_payload.posts) }}' | jq length)"
+
+          python build_all_posts.py \
+            --posts '${{ toJson(github.event.client_payload.posts) }}' \
+            --site '${{ toJson(github.event.client_payload.site) }}' \
+            --year "${{ github.event.client_payload.now.year }}"
+
+      - name: Build index after build all posts
+        if: github.event.action == 'build_all_posts'
+        run: |
+          echo "Building index..."
           python build_index.py \
             --posts '${{ toJson(github.event.client_payload.posts) }}' \
             --site '${{ toJson(github.event.client_payload.site) }}' \
