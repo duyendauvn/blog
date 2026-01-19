@@ -49,6 +49,18 @@ jobs:
             --site '${{ toJson(github.event.client_payload.site) }}' \
             --year "${{ github.event.client_payload.now.year }}"
 
+      - name: Build index when change post
+        if: github.event.action == 'build_post'
+        run: |
+          echo "Building index after post change..."
+          echo "Posts count: $(echo '${{ toJson(github.event.client_payload.site.posts) }}' | jq length)"
+          echo "Year: ${{ github.event.client_payload.now.year }}"
+
+          python build_index.py \
+            --posts '${{ toJson(github.event.client_payload.site.posts) }}' \
+            --site '${{ toJson(github.event.client_payload.site) }}' \
+            --year "${{ github.event.client_payload.now.year }}"
+
       - name: Build index
         if: github.event.action == 'build_index'
         run: |
