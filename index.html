@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+Duyên Đậu Blog - Chia sẻ kiến thức & kinh nghiệm
+</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- <link rel="stylesheet" href="../css/styles.css"> -->
+    <style>
+        /* Giới hạn số dòng content */
+        .post-excerpt {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            line-clamp: 3;
+            /* số dòng */
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .post-img {
+            height: 200px;
+            object-fit: cover;
+        }
+
+        .carousel-img {
+            height: 420px;
+            object-fit: cover;
+        }
+
+        .hero-wrapper {
+            position: relative;
+        }
+
+        /* Ảnh hero */
+        .hero-img {
+            height: 520px;
+            object-fit: cover;
+        }
+
+        /* Overlay đen mờ dần */
+        .hero-overlay {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            background: linear-gradient(to bottom,
+                    rgba(248, 249, 250, 1) 0%,
+                    rgba(248, 249, 250, 0) 30%,
+                    rgba(248, 249, 250, 0) 70%,
+                    rgba(248, 249, 250, 1) 95%);
+            pointer-events: none;
+        }
+
+        /* Search bar */
+        .hero-search {
+            position: absolute;
+            top: 18%;
+            width: 100%;
+            z-index: 2;
+        }
+
+        /* Mobile tối ưu */
+        @media (max-width: 576px) {
+            .hero-img {
+                height: 380px;
+            }
+
+            .hero-search {
+                top: 12%;
+            }
+
+            .hero-search form {
+                flex-direction: column;
+            }
+
+            .hero-search button {
+                margin: 10px 0 0 0 !important;
+                width: 100%;
+            }
+        }
+
+        /* Glass container */
+        .glass-search {
+            padding: 5px;
+            border-radius: 18px;
+
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Input trong suốt hơn */
+        /* .glass-search input {
+            background: rgba(255, 255, 255, 0.65);
+            border-radius: 12px;
+        } */
+
+        /* Focus đẹp hơn */
+        /* .glass-search input:focus {
+            box-shadow: none;
+        } */
+
+        /* Button mềm hơn */
+        .glass-search .btn {
+            border-radius: 12px;
+        }
+
+        /* Mobile tối ưu */
+        @media (max-width: 576px) {
+            .glass-search form {
+                flex-direction: column;
+            }
+
+            .glass-search .btn {
+                width: 100%;
+                margin: 10px 0 0 0 !important;
+            }
+        }
+
+        .glass-search input {
+            /* color: #ffffff !important; */
+            background-color: transparent !important;
+        }
+
+        /* .glass-search input::placeholder {
+            color: rgba(255, 255, 255, 0.75) !important;
+        } */
+
+        .glass-search input:focus {
+            box-shadow: none !important;
+        }
+
+        #heroCarousel {
+            height: calc(100vh - 55px);
+            background-size: cover;
+        }
+
+        .carousel-item,
+        .carousel-inner {
+            height: 100%;
+        }
+
+        .hero-img {
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-hero img {
+            width: 100%;
+            height: 420px;
+            object-fit: cover;
+        }
+
+        article p {
+            line-height: 1.8;
+        }
+
+        .part textarea {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body class="bg-light">
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Dau's Blog</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#blogNavbar">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="blogNavbar">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="/test-blog">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">About me</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#">Contact</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+
+    
+
+<div class="hero-wrapper position-relative">
+
+    <!-- SEARCH BAR -->
+    <div class="hero-search">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-12 col-md-8 col-lg-6">
+
+                    <div class="glass-search">
+                        <form class="d-flex">
+                            <input type="search" class="form-control form-control-lg border-0" 
+                                placeholder="Search blog posts...">
+                            <button class="btn btn-primary ms-2 px-4">
+                                Search
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- OVERLAY -->
+    <div class="hero-overlay"></div>
+
+    <!-- CAROUSEL -->
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="./images/jp1.jpg" class="d-block w-100 hero-img">
+            </div>
+            <div class="carousel-item">
+                <img src="./images/jp2.webp" class="d-block w-100 hero-img">
+            </div>
+        </div>
+
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon"></span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+            <span class="carousel-control-next-icon"></span>
+        </button>
+    </div>
+
+</div>
+
+
+<!-- ================= BLOG POSTS ================= -->
+<div class="container-fluid p-5 my-5">
+    <h2 class="mb-4">Latest Posts</h2>
+
+    <div class="row g-4">
+
+        
+
+    </div>
+</div>
+
+
+
+
+    <footer class="border-top bg-dark py-1">
+        <div class="container text-center text-light">
+            <p class="mb-1">© 2026 duyendau</p>
+            
+            <p class="mb-1">
+                
+                <a href="/contact" class="text-light me-2">Contact</a>
+                
+            </p>
+            
+        </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>
