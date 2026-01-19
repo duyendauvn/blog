@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Create Post</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        body {
+            background: #f4f5f7;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont;
+        }
+
+        .post-wrapper {
+            max-width: 860px;
+            margin: auto;
+            background: #fff;
+        }
+
+        /* ===== POST IMAGE ===== */
+        .post-image {
+            position: relative;
+        }
+
+        .post-image img {
+            width: 100%;
+            height: 520px;
+            object-fit: cover;
+        }
+
+        .post-image input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* ===== CONTENT ===== */
+        .post-content {
+            padding: 2.5rem 2rem;
+        }
+
+        .post-title {
+            font-size: 2.6rem;
+            font-weight: 800;
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+
+        .post-summary {
+            font-size: 1.15rem;
+            color: #6b7280;
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+
+        .editor-input {
+            border: none;
+            outline: none;
+            width: 100%;
+        }
+
+        /* ===== PARTS ===== */
+        .part {
+            position: relative;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-top: 2rem;
+            background: #fafafa;
+        }
+
+        .part textarea {
+            border: none;
+            outline: none;
+            resize: vertical;
+            background: transparent;
+            width: 100%;
+        }
+
+        .part img {
+            max-width: 70%;
+            border-radius: 10px;
+            margin-top: 1rem;
+        }
+
+        .remove-part {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        /* ===== TOOLBAR ===== */
+        .toolbar {
+            position: sticky;
+            bottom: 1rem;
+            max-width: 860px;
+            margin: 2rem auto;
+            background: rgba(255, 255, 255, .95);
+            border-radius: 14px;
+            padding: .75rem 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, .1);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="post-wrapper shadow-sm">
+
+        <!-- POST IMAGE (REQUIRED) -->
+        <div class="post-image">
+            <img id="postImagePreview" src="https://via.placeholder.com/1200x600?text=Upload+Post+Image">
+            <input type="file" id="postImage" accept="image/*" required>
+        </div>
+
+        <div class="post-content">
+
+            <!-- TITLE -->
+            <input id="postTitle" class="post-title mb-3" placeholder="Post title..." required>
+
+            <!-- SLUG -->
+            <input id="postSlug" class="editor-input text-muted mb-4" placeholder="post-slug" required>
+
+            <input id="admin-key" class="editor-input text-muted mb-4" placeholder="admin key" required>
+
+            <!-- SUMMARY -->
+            <textarea id="postSummary" class="post-summary mb-4" rows="2" placeholder="Summary (optional)"></textarea>
+
+            <!-- PARTS -->
+            <div id="partsContainer"></div>
+
+        </div>
+    </div>
+
+    <!-- TOOLBAR -->
+    <div class="toolbar d-flex justify-content-between align-items-center">
+        <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-primary" onclick="addTextPart()">+ Text</button>
+            <button class="btn btn-sm btn-outline-secondary" onclick="addImagePart()">+ Image</button>
+        </div>
+        <button class="btn btn-success px-4" onclick="submitPost()">Publish</button>
+    </div>
+
+    <script>
+        const partsContainer = document.getElementById("partsContainer");
+
+        /* ===== POST IMAGE PREVIEW ===== */
+        document.getElementById("postImage").addEventListener("change", e => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = ev => postImagePreview.src = ev.target.result;
+            reader.readAsDataURL(file);
+        });
+
+        /* ===== ADD PARTS ===== */
+        function addTextPart() {
+            partsContainer.insertAdjacentHTML("beforeend", `
+    <div class="part" data-type="text">
+      <button class="btn btn-sm btn-outline-danger remove-part" onclick="removePart(this)">✕</button>
+
+      <div class="d-flex gap-2 mb-2">
+        <select class="form-select form-select-sm w-auto">
+          <option value="h2">H2</option>
+          <option value="h3">H3</option>
+          <option value="h4">H4</option>
+        </select>
+        <input class="editor-input fw-bold fs-4" placeholder="Heading">
+      </div>
+
+      <textarea rows="4" placeholder="Write content..."></textarea>
+    </div>
+  `);
+        }
+
+        function addImagePart() {
+            partsContainer.insertAdjacentHTML("beforeend", `
+    <div class="part" data-type="image">
+      <button class="btn btn-sm btn-outline-danger remove-part" onclick="removePart(this)">✕</button>
+
+      <input type="file" accept="image/*" class="form-control">
+      <img class="d-none">
+    </div>
+  `);
+        }
+
+        /* ===== REMOVE PART ===== */
+        function removePart(btn) {
+            btn.closest(".part").remove();
+        }
+
+        /* ===== IMAGE PREVIEW ===== */
+        partsContainer.addEventListener("change", e => {
+            if (e.target.type === "file") {
+                const img = e.target.nextElementSibling;
+                const reader = new FileReader();
+                reader.onload = ev => {
+                    img.src = ev.target.result;
+                    img.classList.remove("d-none");
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+
+        /* ===== SUBMIT (MULTIPART) ===== */
+        async function submitPost() {
+            // 1️⃣ Báo ngay khi user nhấn nút
+            alert("Đã nhận bài, đang upload… ⏳");
+
+            const formData = new FormData();
+
+            formData.append("title", postTitle.value);
+            formData.append("slug", postSlug.value);
+            formData.append("summary", postSummary.value);
+            formData.append("admin_key", document.getElementById("admin-key").value);
+            formData.append("post_image", postImage.files[0]);
+
+            document.querySelectorAll(".part").forEach((part, index) => {
+                formData.append(`parts[${index}][type]`, part.dataset.type);
+
+                if (part.dataset.type === "text") {
+                    formData.append(`parts[${index}][level]`, part.querySelector("select").value);
+                    formData.append(`parts[${index}][heading]`, part.querySelector("input").value);
+                    formData.append(`parts[${index}][text]`, part.querySelector("textarea").value);
+                }
+
+                if (part.dataset.type === "image") {
+                    const file = part.querySelector("input[type=file]").files[0];
+                    if (file) {
+                        formData.append(`parts[${index}][image]`, file);
+                    }
+                }
+            });
+
+            try {
+                const res = await fetch("http://127.0.0.1:8000/api/posts", {
+                    method: "POST",
+                    body: formData
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    throw new Error(errText);
+                }
+
+                const data = await res.json();
+
+                // 2️⃣ Upload thành công
+                alert("✅ Publish thành công!");
+
+                // 3️⃣ Chuyển trang
+                window.location.href = data.url;
+
+            } catch (err) {
+                console.error(err);
+                alert("❌ Upload thất bại, kiểm tra lại dữ liệu hoặc admin key");
+            }
+        }
+    </script>
+
+</body>
+
+</html>
