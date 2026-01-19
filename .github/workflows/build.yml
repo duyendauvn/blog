@@ -6,6 +6,9 @@ on:
       - build_post
       - build_index
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
