@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ post.title }} - {{ site.title }}
+{% endblock %}
+
+{% block content %}
+
+<!-- HERO IMAGE -->
+<div class="post-hero">
+    <img src="{{ post.post_image }}" alt="{{ post.title }}">
+</div>
+
+<div class="container my-5">
+    <article class="mx-auto" style="max-width: 860px;">
+
+        <h1 class="fw-bold mb-3">{{ post.title }}</h1>
+
+        {% if post.summary %}
+        <p class="fs-5 text-muted mb-5">{{ post.summary }}</p>
+        {% endif %}
+
+        <!-- POST PARTS -->
+        {% for part in post.parts %}
+        {% if part.type == "text" %}
+        <section class="mb-5">
+            {% if part.heading %}
+            {% if part.level == "h2" %}<h2>{{ part.heading }}</h2>{% endif %}
+            {% if part.level == "h3" %}<h3>{{ part.heading }}</h3>{% endif %}
+            {% if part.level == "h4" %}<h4>{{ part.heading }}</h4>{% endif %}
+            {% endif %}
+            <p class="lh-lg">{{ part.text }}</p>
+        </section>
+        {% endif %}
+
+        {% if part.type == "image" %}
+        <section class="mb-5 text-center">
+            <img src="{{ part.image_url }}" class="img-fluid rounded shadow-sm" style="max-width:70%">
+        </section>
+        {% endif %}
+        {% endfor %}
+
+        <!-- ===== COMMENTS ===== -->
+        <hr class="my-5">
+
+        <section id="comments">
+            <h4 class="mb-4">Comments</h4>
+
+            <!-- COMMENT LIST -->
+            <div id="commentList" class="mb-5"></div>
+
+            <!-- COMMENT FORM -->
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h6 class="mb-3">Leave a comment</h6>
+
+                    <!-- NAME -->
+                    <div class="mb-3">
+                        <input id="commentName" class="form-control" placeholder="Your name">
+                    </div>
+
+                    <!-- CONTENT -->
+                    <textarea id="commentInput" class="form-control mb-3" rows="3"
+                        placeholder="Write your comment..."></textarea>
+
+                    <button class="btn btn-primary" onclick="submitComment()">
+                        Post Comment
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+    </article>
+</div>
+
+<script>
+    const DEFAULT_AVATAR = "https://ui-avatars.com/api/?background=random&name=User";
+
+    const postId = "{{ post.slug }}";
+
+    /* ===== DEFAULT NAME ===== */
+    function generateAnonymousName() {
+        const rand = Math.floor(1000 + Math.random() * 9000);
+        return `Anonymous${rand}`;
+    }
+
+    /* INIT NAME */
+    const nameInput = document.getElementById("commentName");
+    nameInput.value = generateAnonymousName();
+
+    /* ===== MOCK FETCH COMMENTS ===== */
+    async function fetchComments() {
+        const res = await fetch(`http://127.0.0.1:8000/api/posts/${postId}/comments`);
+        const data = await res.json();
+        renderComments(data.comments);
+    }
+
+
+    /* ===== RENDER COMMENTS ===== */
+    function renderComments(comments) {
+        const container = document.getElementById("commentList");
+        container.innerHTML = "";
+
+        comments.forEach(c => {
+            container.insertAdjacentHTML("beforeend", `
+            <div class="d-flex gap-3 mb-4">
+                <img src="${DEFAULT_AVATAR}" class="rounded-circle" width="40" height="40">
+                <div>
+                    <div class="fw-semibold">${escapeHtml(c.name)}</div>
+                    <div class="small text-muted mb-1">${c.created_at}</div>
+                    <div>${escapeHtml(c.content)}</div>
+                </div>
+            </div>
+        `);
+        });
+    }
+
+    /* ===== SUBMIT COMMENT ===== */
+    async function submitComment() {
+        const name = nameInput.value.trim() || generateAnonymousName();
+        const content = commentInput.value.trim();
+        if (!content) return;
+
+        const formData = new FormData();
+        formData.append("name", name);
+        formData.append("content", content);
+
+        const res = await fetch(`http://127.0.0.1:8000/api/posts/${postId}/comments`, {
+            method: "POST",
+            body: formData
+        });
+
+        if (!res.ok) {
+            alert("Comment failed");
+            return;
+        }
+
+        const data = await res.json();
+
+        prependComment({
+            avatar: DEFAULT_AVATAR, // "https://ui-avatars.com/api/?name=" + encodeURIComponent(name),
+            ...data.comment
+        });
+
+        commentInput.value = "";
+    }
+
+
+    /* ===== PREPEND COMMENT ===== */
+    function prependComment(c) {
+        const container = document.getElementById("commentList");
+        container.insertAdjacentHTML("afterbegin", `
+        <div class="d-flex gap-3 mb-4">
+            <img src="${DEFAULT_AVATAR}" class="rounded-circle" width="40" height="40">
+            <div>
+                <div class="fw-semibold">${escapeHtml(c.name)}</div>
+                <div class="small text-muted mb-1">${c.created_at}</div>
+                <div>${escapeHtml(c.content)}</div>
+            </div>
+        </div>
+    `);
+    }
+
+    /* ===== SECURITY ===== */
+    function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    /* INIT */
+    fetchComments();
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,68 @@
+name: Build SSG
+
+on:
+  repository_dispatch:
+    types:
+      - build_post
+      - build_index
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Debug event
+        run: |
+          echo "Event type: ${{ github.event.action }}"
+          echo "Payload:"
+          echo '${{ toJson(github.event.client_payload) }}'
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install jinja2
+
+      - name: Build post
+        if: github.event.action == 'build_post'
+        run: |
+          echo "Building post..."
+          echo "Slug: ${{ github.event.client_payload.slug }}"
+          echo "Title: ${{ github.event.client_payload.post.title }}"
+          echo "Year: ${{ github.event.client_payload.now.year }}"
+
+          python build_post.py \
+            --slug "${{ github.event.client_payload.slug }}" \
+            --post '${{ toJson(github.event.client_payload.post) }}' \
+            --site '${{ toJson(github.event.client_payload.site) }}' \
+            --year "${{ github.event.client_payload.now.year }}"
+
+      - name: Build index
+        if: github.event.action == 'build_index'
+        run: |
+          echo "Building index..."
+          echo "Posts count: $(echo '${{ toJson(github.event.client_payload.posts) }}' | jq length)"
+          echo "Year: ${{ github.event.client_payload.now.year }}"
+
+          python build_index.py \
+            --posts '${{ toJson(github.event.client_payload.posts) }}' \
+            --site '${{ toJson(github.event.client_payload.site) }}' \
+            --year "${{ github.event.client_payload.now.year }}"
+
+      - name: Commit & push changes
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+
+          git add .
+          git commit -m "Auto build: ${{ github.event.action }}" || echo "Nothing to commit"
+          git push
