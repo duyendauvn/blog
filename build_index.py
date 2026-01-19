@@ -22,6 +22,8 @@ args = parser.parse_args()
 posts = json.loads(args.posts)
 site = json.loads(args.site)
 
+posts = posts[::-1]  # reverse to have newest first
+
 print("Number of posts:", len(posts))
 print("Year:", args.year)
 print("Site title:", site["title"])
