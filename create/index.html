@@ -211,7 +211,7 @@
         /* ===== SUBMIT (MULTIPART) ===== */
         async function submitPost() {
             // 1️⃣ Báo ngay khi user nhấn nút
-            alert("Đã nhận bài, đang upload… ⏳");
+            alert("Đã nhận bài, đang upload…");
 
             const formData = new FormData();
 
@@ -252,14 +252,15 @@
                 const data = await res.json();
 
                 // 2️⃣ Upload thành công
-                alert("✅ Publish thành công!");
+                alert("Bài viết đang được xử lý và sẽ có sau vài phút!");
 
                 // 3️⃣ Chuyển trang
-                window.location.href = `/blog/${data.url}`;
+                // window.location.href = `/blog${data.url}`;
+                window.location.href = `/blog`;
 
             } catch (err) {
                 console.error(err);
-                alert("❌ Upload thất bại, kiểm tra lại dữ liệu hoặc admin key: " + err.message);
+                alert("Upload thất bại, lỗi: " + err.message);
             }
         }
     </script>
